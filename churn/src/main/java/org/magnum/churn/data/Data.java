@@ -1,5 +1,6 @@
 package org.magnum.churn.data;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -18,8 +19,12 @@ public class Data {
 
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	
+	
 	// Initialize me
-	private Map<String,Object> rawData_;
+	private Map<String,Object> rawData_ = new HashMap<String,Object>();
+	
+	// ???
+	private Map<String, Object> mapConverter = new HashMap<String,Object>();;
 	
 	private String labelAttribute_;
 	/**
@@ -28,6 +33,7 @@ public class Data {
 	 * 
 	 * @return
 	 */
+	
 	public List<String> keyOrdering(){
 		return rawData_.keySet().stream().collect(Collectors.toList());
 	}
@@ -46,11 +52,14 @@ public class Data {
 	 * 
 	 * @return
 	 */
+
 	public List<Double> toVector(){
 		return rawData_.keySet()
 				.stream().mapToDouble((item) -> {
 					// Use the converter set below
-					return 0d;
+					@SuppressWarnings("unchecked")
+					Function<Object,Double> converter = (Function<Object,Double>) mapConverter.get(item);
+					return converter.apply(rawData_.get(item));
 				})
 				.boxed()
 				.collect(Collectors.toList());
@@ -63,20 +72,36 @@ public class Data {
 	
 	public void setData(double[] vector){
 		//fill me in
+		for (int i=0; i<vector.length; i++) {
+			rawData_.put(""+i, vector[i]);
+		}
 	}
 	
 	public void setData(Map<String,Object> data){
 		//fill me in
+		for (String s: data.keySet()) {
+			rawData_.put(s, data.get(s));
+		}
 	}
 	
 	public Object getLabel(){
 		// Fill me in
-		return null;
+		return labelAttribute_;
 	}
 	
-	public void setNumericConvertver(String propertyName, Function<Object,Double> converter){
+	public void setNumericConverter(String propertyName, Function<Object,Double> converter){
 		// Fangzhou, this should set the converter function that is used for
 		// each property above
+		
+		mapConverter.put(propertyName, converter);
+		
+//		converter = new Function<Object, Double>() {
+//			public Double apply(Object obj) {
+//				Double d = 0d;
+//				return d;
+//			}
+//		};
+		
 	}
 	
 }
