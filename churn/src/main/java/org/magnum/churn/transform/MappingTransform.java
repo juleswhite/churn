@@ -30,6 +30,7 @@ public class MappingTransform<I,O> implements Transform<I,O> {
 	@Override
 	public O apply(I t) {
 		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
